@@ -3,7 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Asistencia - Laboratorio</title>
+    
+    <!-- ===== METAETIQUETAS PARA GOOGLE Y SEO ===== -->
+    <title>Asistencia del Laboratorio NSC - Registro de Estudiantes</title>
+    <meta name="description" content="Sistema de registro de asistencia del Laboratorio NSC. Gestiona estudiantes de primero, segundo y tercero básico. Busca por nombre, número de clave o grado. Genera reportes PDF con fecha y hora del dispositivo.">
+    <meta name="keywords" content="Asistencia Laboratorio NSC, registro estudiantes, primero básico, segundo básico, tercero básico, sistema asistencia escolar, PDF asistencia, laboratorio NSC">
+    <meta name="author" content="Laboratorio NSC">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- ===== OPEN GRAPH (Para compartir en redes sociales) ===== -->
+    <meta property="og:title" content="Asistencia del Laboratorio NSC - Registro de Estudiantes">
+    <meta property="og:description" content="Registro y control de asistencia para estudiantes de primero, segundo y tercero básico del Laboratorio NSC">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_GT">
+    <meta property="og:site_name" content="Laboratorio NSC">
+    
+    <!-- ===== TWITTER CARD ===== -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Asistencia del Laboratorio NSC">
+    <meta name="twitter:description" content="Registro de asistencia para laboratorio escolar - Laboratorio NSC">
+    
+    <!-- ===== FAVICON (Icono de la pestaña) ===== -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+
     <style>
         :root {
             --bg-dark: #0a0a0a;
@@ -449,7 +473,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>LABORATORIO</h1>
+            <h1>LABORATORIO NSC</h1>
             <p class="subtitle">Sistema de Registro de Asistencia</p>
             <div class="line"></div>
         </div>
@@ -553,7 +577,6 @@
 
             // ==================== ESTADO DE LA APLICACIÓN ====================
             let attendanceList = [];
-            // Contador único para IDs
             let idCounter = 1;
 
             // ==================== ELEMENTOS DEL DOM ====================
@@ -605,8 +628,8 @@
                 }
                 const newEntry = {
                     ...student,
-                    status: 'nulo', // nulo, presente, ausente
-                    id: idCounter++ // Usar contador numérico simple
+                    status: 'nulo',
+                    id: idCounter++
                 };
                 attendanceList.push(newEntry);
                 renderAttendance();
@@ -622,7 +645,6 @@
                 const entry = attendanceList.find(item => item.id === entryId);
                 if (!entry) return;
                 
-                // Ciclar: nulo -> presente -> ausente -> nulo
                 if (entry.status === 'nulo') {
                     entry.status = 'presente';
                 } else if (entry.status === 'presente') {
@@ -666,7 +688,6 @@
                         <tbody>
                 `;
                 results.forEach(student => {
-                    const uniqueKey = student.grado + '_' + student.clave;
                     html += `
                         <tr>
                             <td><strong>${student.clave}</strong></td>
@@ -684,7 +705,6 @@
                 html += '</tbody></table>';
                 resultsContainer.innerHTML = html;
                 
-                // Agregar event listeners a los botones AGREGAR
                 document.querySelectorAll('.btn-add').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const grado = this.getAttribute('data-grado');
@@ -739,7 +759,6 @@
                 html += '</tbody></table>';
                 attendanceContainer.innerHTML = html;
                 
-                // Agregar event listeners a los botones de estado
                 document.querySelectorAll('.status-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const entryId = parseInt(this.getAttribute('data-entry-id'));
@@ -747,7 +766,6 @@
                     });
                 });
                 
-                // Agregar event listeners a los botones QUITAR
                 document.querySelectorAll('.btn-remove').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const entryId = parseInt(this.getAttribute('data-entry-id'));
@@ -811,7 +829,7 @@
                 <html lang="es">
                 <head>
                     <meta charset="UTF-8">
-                    <title>Asistencia Laboratorio - ${fechaStr}</title>
+                    <title>Asistencia del Laboratorio NSC - ${fechaStr}</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body {
@@ -916,7 +934,7 @@
                 </head>
                 <body>
                     <div class="header">
-                        <h1>LABORATORIO - REGISTRO DE ASISTENCIA</h1>
+                        <h1>LABORATORIO NSC - REGISTRO DE ASISTENCIA</h1>
                         <p class="sub">Personas que estuvieron en el laboratorio</p>
                     </div>
                     <div class="meta">
@@ -961,7 +979,7 @@
                         <div>📋 Total: ${attendanceList.length}</div>
                     </div>
                     <div class="footer">
-                        Documento generado automáticamente · Laboratorio · ${fechaStr} a las ${horaStr}
+                        Documento generado automáticamente · Laboratorio NSC · ${fechaStr} a las ${horaStr}
                     </div>
                 </body>
                 </html>
@@ -999,11 +1017,14 @@
                 const allStudents = getAllStudents();
                 renderResults(allStudents);
                 renderAttendance();
+                
+                // Actualizar el título de la página
+                document.title = 'Asistencia del Laboratorio NSC - Registro de Estudiantes';
             }
 
             init();
 
-            console.log('✅ Sistema de Asistencia Laboratorio inicializado correctamente.');
+            console.log('✅ Asistencia del Laboratorio NSC inicializado correctamente.');
             console.log('📊 Base de datos cargada:', getAllStudents().length, 'estudiantes.');
             console.log('🔄 Botones de estado: NULO (gris) → PRESENTE (verde) → AUSENTE (rojo) → NULO (gris)');
         })();
