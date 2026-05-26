@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Asistencia - Laboratorio</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-panel: #141414;
+            --bg-card: #1a1a1a;
+            --bg-input: #1e1e1e;
+            --border: #2a2a2a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --magenta: #c2185b;
+            --magenta-dark: #8b0045;
+            --magenta-light: #e91e63;
+            --green: #2e7d32;
+            --green-light: #4caf50;
+            --red: #b71c1c;
+            --red-light: #ef5350;
+            --gray-state: #616161;
+            --gray-state-light: #9e9e9e;
+            --white-accent: #f5f5f5;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            --radius: 8px;
+            --radius-sm: 5px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 15px;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(194, 24, 91, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(194, 24, 91, 0.03) 0%, transparent 60%);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 15px 10px;
+        }
+        .header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--white-accent);
+            margin-bottom: 4px;
+        }
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--magenta-light);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 500;
+        }
+        .header .line {
+            width: 60px;
+            height: 3px;
+            background: var(--magenta);
+            margin: 8px auto 0;
+            border-radius: 2px;
+        }
+
+        /* Panel principal */
+        .search-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        .search-panel label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .search-input {
+            flex: 1 1 220px;
+            min-width: 180px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: var(--magenta);
+            box-shadow: 0 0 0 2px rgba(194, 24, 91, 0.25);
+        }
+        .search-input::placeholder {
+            color: #555;
+        }
+        .filter-select {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            min-width: 140px;
+            transition: var(--transition);
+        }
+        .filter-select:focus {
+            border-color: var(--magenta);
+        }
+        .filter-select option {
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .btn-search {
+            background: var(--magenta-dark);
+            color: var(--white-accent);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .btn-search:hover {
+            background: var(--magenta);
+            box-shadow: 0 0 15px rgba(194, 24, 91, 0.4);
+        }
+        .btn-clear-search {
+            background: transparent;
+            border: 1px solid #444;
+            color: #aaa;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .btn-clear-search:hover {
+            border-color: #888;
+            color: #fff;
+        }
+
+        /* Resultados de búsqueda */
+        .results-section {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow);
+        }
+        .results-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--magenta-light);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .results-table th {
+            background: #111;
+            color: var(--text-secondary);
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid #2a2a2a;
+        }
+        .results-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #222;
+            color: #ccc;
+        }
+        .results-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .btn-add {
+            background: var(--magenta-dark);
+            color: #fff;
+            border: none;
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: var(--transition);
+            letter-spacing: 0.4px;
+        }
+        .btn-add:hover {
+            background: var(--magenta);
+            box-shadow: 0 0 10px rgba(194, 24, 91, 0.5);
+        }
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Tabla de Asistencia */
+        .attendance-section {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow);
+            margin-top: 5px;
+        }
+        .attendance-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--magenta-light);
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        .attendance-table th {
+            background: #111;
+            color: var(--text-secondary);
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid #2a2a2a;
+        }
+        .attendance-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #222;
+            color: #ccc;
+        }
+        .attendance-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .status-btn {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 2px solid #444;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.78rem;
+            transition: all 0.25s ease;
+            background: var(--gray-state);
+            color: #ccc;
+            min-width: 80px;
+            text-align: center;
+            letter-spacing: 0.4px;
+            user-select: none;
+        }
+        .status-btn.presente {
+            background: var(--green);
+            border-color: var(--green-light);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+        }
+        .status-btn.ausente {
+            background: var(--red);
+            border-color: var(--red-light);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(239, 83, 80, 0.3);
+        }
+        .status-btn.nulo {
+            background: var(--gray-state);
+            border-color: var(--gray-state-light);
+            color: #aaa;
+            box-shadow: none;
+        }
+        .btn-remove {
+            background: transparent;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+        .btn-remove:hover {
+            background: #2a2a2a;
+            border-color: var(--magenta-light);
+            color: #fff;
+        }
+        .empty-attendance {
+            text-align: center;
+            padding: 25px;
+            color: #555;
+            font-style: italic;
+            border: 1px dashed #333;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Botón descargar PDF */
+        .btn-download-pdf {
+            background: var(--magenta-dark);
+            color: #fff;
+            border: none;
+            padding: 11px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .btn-download-pdf:hover {
+            background: var(--magenta);
+            box-shadow: 0 0 20px rgba(194, 24, 91, 0.5);
+            transform: translateY(-1px);
+        }
+
+        /* Footer info */
+        .info-badge {
+            font-size: 0.75rem;
+            color: #777;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .info-badge span {
+            background: #1a1a1a;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-input,
+            .filter-select {
+                width: 100%;
+                min-width: auto;
+            }
+            .results-table,
+            .attendance-table {
+                font-size: 0.78rem;
+            }
+            .results-table th,
+            .results-table td,
+            .attendance-table th,
+            .attendance-table td {
+                padding: 8px 4px;
+            }
+            .btn-add,
+            .btn-remove,
+            .status-btn {
+                padding: 5px 8px;
+                font-size: 0.7rem;
+            }
+            .btn-download-pdf {
+                padding: 10px 18px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            .results-table thead,
+            .attendance-table thead {
+                display: none;
+            }
+            .results-table tbody tr,
+            .attendance-table tbody tr {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #222;
+                padding: 10px 0;
+            }
+            .results-table td,
+            .attendance-table td {
+                border-bottom: none;
+                padding: 4px 2px;
+            }
+            .results-table td:first-child,
+            .attendance-table td:first-child {
+                font-weight: bold;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>LABORATORIO</h1>
+            <p class="subtitle">Sistema de Registro de Asistencia</p>
+            <div class="line"></div>
+        </div>
+
+        <!-- Panel de Búsqueda -->
+        <div class="search-panel" id="searchPanel">
+            <label for="searchInput">🔍 BUSCAR:</label>
+            <input type="text" id="searchInput" class="search-input" placeholder="Nombre o número de clave..." autocomplete="off">
+            <label for="gradeFilter">📚 GRADO:</label>
+            <select id="gradeFilter" class="filter-select">
+                <option value="todos">Todos los grados</option>
+                <option value="primero">Primero Básico</option>
+                <option value="segundo">Segundo Básico</option>
+                <option value="tercero">Tercero Básico</option>
+            </select>
+            <button id="btnSearch" class="btn-search">BUSCAR</button>
+            <button id="btnClearSearch" class="btn-clear-search">✕ LIMPIAR</button>
+        </div>
+
+        <!-- Resultados de búsqueda -->
+        <div class="results-section" id="resultsSection">
+            <h3>📋 RESULTADOS DE BÚSQUEDA</h3>
+            <div id="resultsContainer">
+                <p class="no-results">Realiza una búsqueda para ver estudiantes.</p>
+            </div>
+        </div>
+
+        <!-- Tabla de Asistencia -->
+        <div class="attendance-section" id="attendanceSection">
+            <h3>
+                ✅ LISTA DE ASISTENCIA
+                <span class="info-badge">
+                    <span id="attendanceCount">0 registros</span>
+                </span>
+            </h3>
+            <div id="attendanceContainer">
+                <div class="empty-attendance">No hay estudiantes en la lista de asistencia. Agrega desde los resultados de búsqueda.</div>
+            </div>
+            <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                <button id="btnDownloadPDF" class="btn-download-pdf">📄 DESCARGAR PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== BASE DE DATOS LOCAL ====================
+            const database = {
+                primero: [
+                    { clave: 1, apellidos: "BARÁN MÉNDEZ", nombre: "DIEGO BENJAMIN", grado: "Primero Básico" },
+                    { clave: 2, apellidos: "ARANA DUBÓN", nombre: "CARLOS DANIEL", grado: "Primero Básico" },
+                    { clave: 3, apellidos: "BARRERA LEMUS", nombre: "RICHARD URIEL", grado: "Primero Básico" },
+                    { clave: 4, apellidos: "CABRERA REYES", nombre: "SONDURY MEGHAN BEATRIZ", grado: "Primero Básico" },
+                    { clave: 5, apellidos: "DE LEÓN ARANA", nombre: "ADRIANA MARISOL", grado: "Primero Básico" },
+                    { clave: 6, apellidos: "GONZÁLEZ GONZÁLEZ", nombre: "SARA GABRIELA", grado: "Primero Básico" },
+                    { clave: 7, apellidos: "HERNÁNDEZ CAC", nombre: "ASHELY MISHELL", grado: "Primero Básico" },
+                    { clave: 8, apellidos: "HERNÁNDEZ MARROQUÍN", nombre: "OSCAR EDUARDO", grado: "Primero Básico" },
+                    { clave: 9, apellidos: "JOCON GOMEZ", nombre: "LUIS FERNANDO", grado: "Primero Básico" },
+                    { clave: 10, apellidos: "LOPEZ RAMIREZ", nombre: "HEILY MARIANA", grado: "Primero Básico" },
+                    { clave: 11, apellidos: "MARTÍNEZ GUZMÁN", nombre: "BRANDON ESTUARDO", grado: "Primero Básico" },
+                    { clave: 12, apellidos: "PELÉN HERNÁNDEZ", nombre: "ANDRÉ ALEJANDRO", grado: "Primero Básico" },
+                    { clave: 13, apellidos: "PIEDRASANTA GONZÁLEZ", nombre: "ADRIANA YULISSA", grado: "Primero Básico" },
+                    { clave: 14, apellidos: "RAMOS PALMA", nombre: "BRIANA SOFÍA", grado: "Primero Básico" },
+                    { clave: 15, apellidos: "CABRERA REYES", nombre: "JUAN CARLOS", grado: "Primero Básico" },
+                    { clave: 16, apellidos: "SARAVIA ARANA", nombre: "MARIANA ALEJANDRA", grado: "Primero Básico" },
+                    { clave: 17, apellidos: "YAX SIM", nombre: "CAMILA GERALDINE SOFIA", grado: "Primero Básico" }
+                ],
+                segundo: [
+                    { clave: 1, apellidos: "BARRIOS FUENTES", nombre: "JOSUE OSWALDO", grado: "Segundo Básico" },
+                    { clave: 2, apellidos: "DOMINGO HERNÁNDEZ", nombre: "CESAR ALEJANDRO", grado: "Segundo Básico" },
+                    { clave: 3, apellidos: "ESCALANTE TRUJILLO", nombre: "ANDREZ JOSÈ", grado: "Segundo Básico" },
+                    { clave: 4, apellidos: "GARCÍA LINARES", nombre: "ALLISON ANAHÍ", grado: "Segundo Básico" },
+                    { clave: 5, apellidos: "HERNÁNDEZ LÓPEZ", nombre: "EDWARD ANTONIO", grado: "Segundo Básico" },
+                    { clave: 6, apellidos: "LIMA DE LEÓN", nombre: "OSCAR LEONEL", grado: "Segundo Básico" },
+                    { clave: 7, apellidos: "LÓPEZ REYES", nombre: "DANIEL EMANUEL", grado: "Segundo Básico" },
+                    { clave: 8, apellidos: "LÓPEZ ZEPEDA", nombre: "ETHAN DANIEL ALEXANDER", grado: "Segundo Básico" },
+                    { clave: 9, apellidos: "MACARIO PÉREZ", nombre: "MARLON DAVID", grado: "Segundo Básico" },
+                    { clave: 10, apellidos: "MACZ GALEANO", nombre: "WILSON JOAB", grado: "Segundo Básico" },
+                    { clave: 11, apellidos: "MARTÍNEZ RAMÍREZ", nombre: "GABRIEL EDUARDO", grado: "Segundo Básico" },
+                    { clave: 12, apellidos: "MELCHOR TECÚN", nombre: "OBED DAVID OSVALDO", grado: "Segundo Básico" },
+                    { clave: 13, apellidos: "VIELMAN PIEDRASANTA", nombre: "IAN ANDRE", grado: "Segundo Básico" }
+                ],
+                tercero: [
+                    { clave: 1, apellidos: "DURINI VALENCIA", nombre: "LILIAN ARACELY", grado: "Tercero Básico" },
+                    { clave: 2, apellidos: "GODOY CASTILLO", nombre: "EDELAYN YANESSA", grado: "Tercero Básico" },
+                    { clave: 3, apellidos: "GÓMEZ CASTILLO", nombre: "ESTEFANI SOFIA", grado: "Tercero Básico" },
+                    { clave: 4, apellidos: "GORDILLO OROZCO", nombre: "ALISSON MISHEL", grado: "Tercero Básico" },
+                    { clave: 5, apellidos: "JAX FUENTES", nombre: "PEDRO DAVID", grado: "Tercero Básico" },
+                    { clave: 6, apellidos: "JUÁREZ LEMUS", nombre: "SEBASTIÁN EMILIANO", grado: "Tercero Básico" },
+                    { clave: 7, apellidos: "LÓPEZ VASQUEZ", nombre: "CARLOS MAURICIO", grado: "Tercero Básico" },
+                    { clave: 8, apellidos: "MACZ ALVARADO", nombre: "ALLISON ABIGAIL", grado: "Tercero Básico" },
+                    { clave: 9, apellidos: "MONROY MALDONADO", nombre: "GABRIEL ALEJANDRO", grado: "Tercero Básico" },
+                    { clave: 10, apellidos: "OLIVEROS DE LEÓN", nombre: "DIEGO ELÍ", grado: "Tercero Básico" },
+                    { clave: 11, apellidos: "RAMÍREZ TORRES", nombre: "ALEX SANTIAGO", grado: "Tercero Básico" },
+                    { clave: 12, apellidos: "RAMÍREZ VALENCIA", nombre: "DEIVID SEBASTIAN", grado: "Tercero Básico" },
+                    { clave: 13, apellidos: "URIAS DÍAZ", nombre: "JEREMY VICTOR ALBERTO", grado: "Tercero Básico" },
+                    { clave: 14, apellidos: "VALENCIA BARTOLO", nombre: "ESTEFANY NICOLE", grado: "Tercero Básico" },
+                    { clave: 15, apellidos: "VÉLIZ PADILLA", nombre: "PABLO SAMUEL", grado: "Tercero Básico" }
+                ]
+            };
+
+            // ==================== ESTADO DE LA APLICACIÓN ====================
+            let attendanceList = [];
+            // Contador único para IDs
+            let idCounter = 1;
+
+            // ==================== ELEMENTOS DEL DOM ====================
+            const searchInput = document.getElementById('searchInput');
+            const gradeFilter = document.getElementById('gradeFilter');
+            const btnSearch = document.getElementById('btnSearch');
+            const btnClearSearch = document.getElementById('btnClearSearch');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const attendanceContainer = document.getElementById('attendanceContainer');
+            const attendanceCountSpan = document.getElementById('attendanceCount');
+            const btnDownloadPDF = document.getElementById('btnDownloadPDF');
+
+            // ==================== FUNCIONES AUXILIARES ====================
+            function normalizeText(str) {
+                return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+            }
+
+            function getAllStudents() {
+                return [...database.primero, ...database.segundo, ...database.tercero];
+            }
+
+            function getStudentsByGrade(gradeKey) {
+                if (gradeKey === 'primero') return [...database.primero];
+                if (gradeKey === 'segundo') return [...database.segundo];
+                if (gradeKey === 'tercero') return [...database.tercero];
+                return getAllStudents();
+            }
+
+            function searchStudents(query, gradeKey) {
+                const pool = getStudentsByGrade(gradeKey);
+                if (!query || query.trim() === '') return pool;
+                const q = normalizeText(query);
+                return pool.filter(student => {
+                    const fullName = normalizeText(student.apellidos + ' ' + student.nombre);
+                    const claveStr = student.clave.toString();
+                    return fullName.includes(q) || claveStr.includes(q);
+                });
+            }
+
+            function isInAttendance(student) {
+                const key = student.grado + '|' + student.clave;
+                return attendanceList.some(item => (item.grado + '|' + item.clave) === key);
+            }
+
+            function addToAttendance(student) {
+                if (isInAttendance(student)) {
+                    alert('Este estudiante ya está en la lista de asistencia.');
+                    return false;
+                }
+                const newEntry = {
+                    ...student,
+                    status: 'nulo', // nulo, presente, ausente
+                    id: idCounter++ // Usar contador numérico simple
+                };
+                attendanceList.push(newEntry);
+                renderAttendance();
+                return true;
+            }
+
+            function removeFromAttendance(entryId) {
+                attendanceList = attendanceList.filter(item => item.id !== entryId);
+                renderAttendance();
+            }
+
+            function cycleStatus(entryId) {
+                const entry = attendanceList.find(item => item.id === entryId);
+                if (!entry) return;
+                
+                // Ciclar: nulo -> presente -> ausente -> nulo
+                if (entry.status === 'nulo') {
+                    entry.status = 'presente';
+                } else if (entry.status === 'presente') {
+                    entry.status = 'ausente';
+                } else {
+                    entry.status = 'nulo';
+                }
+                
+                renderAttendance();
+            }
+
+            function getStatusLabel(status) {
+                if (status === 'presente') return 'PRESENTE';
+                if (status === 'ausente') return 'AUSENTE';
+                return 'NULO';
+            }
+
+            function getStatusClass(status) {
+                if (status === 'presente') return 'presente';
+                if (status === 'ausente') return 'ausente';
+                return 'nulo';
+            }
+
+            // ==================== RENDERIZADO ====================
+            function renderResults(results) {
+                if (!results || results.length === 0) {
+                    resultsContainer.innerHTML = '<p class="no-results">No se encontraron estudiantes con ese criterio.</p>';
+                    return;
+                }
+                let html = `
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Apellidos</th>
+                                <th>Nombre</th>
+                                <th>Grado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                results.forEach(student => {
+                    const uniqueKey = student.grado + '_' + student.clave;
+                    html += `
+                        <tr>
+                            <td><strong>${student.clave}</strong></td>
+                            <td>${student.apellidos}</td>
+                            <td>${student.nombre}</td>
+                            <td>${student.grado}</td>
+                            <td>
+                                <button class="btn-add" data-grado="${student.grado}" data-clave="${student.clave}">
+                                    ➕ AGREGAR
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                resultsContainer.innerHTML = html;
+                
+                // Agregar event listeners a los botones AGREGAR
+                document.querySelectorAll('.btn-add').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const grado = this.getAttribute('data-grado');
+                        const clave = parseInt(this.getAttribute('data-clave'));
+                        addToAttendanceByData(grado, clave);
+                    });
+                });
+            }
+
+            function renderAttendance() {
+                attendanceCountSpan.textContent = attendanceList.length + ' registros';
+                if (attendanceList.length === 0) {
+                    attendanceContainer.innerHTML = '<div class="empty-attendance">No hay estudiantes en la lista de asistencia. Agrega desde los resultados de búsqueda.</div>';
+                    return;
+                }
+                let html = `
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Apellidos</th>
+                                <th>Nombre</th>
+                                <th>Grado</th>
+                                <th>Estado</th>
+                                <th>Quitar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                attendanceList.forEach(entry => {
+                    const statusClass = getStatusClass(entry.status);
+                    const statusLabel = getStatusLabel(entry.status);
+                    html += `
+                        <tr>
+                            <td><strong>${entry.clave}</strong></td>
+                            <td>${entry.apellidos}</td>
+                            <td>${entry.nombre}</td>
+                            <td>${entry.grado}</td>
+                            <td>
+                                <button class="status-btn ${statusClass}" data-entry-id="${entry.id}">
+                                    ${statusLabel}
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn-remove" data-entry-id="${entry.id}">
+                                    ❌ QUITAR
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                attendanceContainer.innerHTML = html;
+                
+                // Agregar event listeners a los botones de estado
+                document.querySelectorAll('.status-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const entryId = parseInt(this.getAttribute('data-entry-id'));
+                        cycleStatus(entryId);
+                    });
+                });
+                
+                // Agregar event listeners a los botones QUITAR
+                document.querySelectorAll('.btn-remove').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const entryId = parseInt(this.getAttribute('data-entry-id'));
+                        removeFromAttendance(entryId);
+                        refreshCurrentSearch();
+                    });
+                });
+            }
+
+            function addToAttendanceByData(grado, clave) {
+                const all = getAllStudents();
+                const student = all.find(s => s.grado === grado && s.clave === clave);
+                if (student) {
+                    const added = addToAttendance(student);
+                    if (added) {
+                        refreshCurrentSearch();
+                    }
+                }
+            }
+
+            function refreshCurrentSearch() {
+                const query = searchInput.value;
+                const grade = gradeFilter.value;
+                const results = searchStudents(query, grade);
+                renderResults(results);
+            }
+
+            function performSearch() {
+                const query = searchInput.value;
+                const grade = gradeFilter.value;
+                const results = searchStudents(query, grade);
+                renderResults(results);
+            }
+
+            function clearSearch() {
+                searchInput.value = '';
+                gradeFilter.value = 'todos';
+                const results = getAllStudents();
+                renderResults(results);
+            }
+
+            function downloadPDF() {
+                if (attendanceList.length === 0) {
+                    alert('No hay registros en la lista de asistencia para descargar.');
+                    return;
+                }
+                generatePDF();
+            }
+
+            function generatePDF() {
+                const now = new Date();
+                const fechaStr = now.toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: 'numeric' });
+                const horaStr = now.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+                const presenteCount = attendanceList.filter(e => e.status === 'presente').length;
+                const ausenteCount = attendanceList.filter(e => e.status === 'ausente').length;
+                const nuloCount = attendanceList.filter(e => e.status === 'nulo').length;
+
+                let printHTML = `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Asistencia Laboratorio - ${fechaStr}</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: 'Segoe UI', Arial, sans-serif;
+                            background: #fff;
+                            color: #1a1a1a;
+                            padding: 30px 25px;
+                            line-height: 1.5;
+                        }
+                        .header {
+                            text-align: center;
+                            border-bottom: 3px solid #c2185b;
+                            padding-bottom: 15px;
+                            margin-bottom: 20px;
+                        }
+                        .header h1 {
+                            font-size: 24px;
+                            letter-spacing: 1px;
+                            color: #111;
+                            margin-bottom: 4px;
+                        }
+                        .header .sub {
+                            color: #c2185b;
+                            font-weight: 600;
+                            font-size: 13px;
+                            text-transform: uppercase;
+                            letter-spacing: 2px;
+                        }
+                        .meta {
+                            text-align: center;
+                            font-size: 13px;
+                            color: #444;
+                            margin-bottom: 25px;
+                            background: #f9f9f9;
+                            padding: 10px;
+                            border-radius: 6px;
+                            border: 1px solid #ddd;
+                        }
+                        .meta strong {
+                            color: #c2185b;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 10px;
+                            font-size: 13px;
+                        }
+                        th {
+                            background: #1a1a1a;
+                            color: #fff;
+                            padding: 10px 7px;
+                            text-align: left;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        td {
+                            padding: 8px 7px;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        tr:nth-child(even) td {
+                            background: #fafafa;
+                        }
+                        .badge {
+                            display: inline-block;
+                            padding: 3px 12px;
+                            border-radius: 15px;
+                            font-weight: 700;
+                            font-size: 11px;
+                            letter-spacing: 0.5px;
+                            color: #fff;
+                        }
+                        .badge.presente { background: #2e7d32; }
+                        .badge.ausente { background: #b71c1c; }
+                        .badge.nulo { background: #616161; }
+                        .summary {
+                            margin-top: 25px;
+                            display: flex;
+                            gap: 20px;
+                            justify-content: center;
+                            flex-wrap: wrap;
+                            font-size: 13px;
+                        }
+                        .summary div {
+                            background: #f0f0f0;
+                            padding: 10px 18px;
+                            border-radius: 20px;
+                            font-weight: 600;
+                        }
+                        .footer {
+                            text-align: center;
+                            margin-top: 30px;
+                            font-size: 11px;
+                            color: #888;
+                            border-top: 1px solid #ddd;
+                            padding-top: 12px;
+                        }
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>LABORATORIO - REGISTRO DE ASISTENCIA</h1>
+                        <p class="sub">Personas que estuvieron en el laboratorio</p>
+                    </div>
+                    <div class="meta">
+                        📅 <strong>Fecha:</strong> ${fechaStr} &nbsp;&nbsp;| &nbsp;&nbsp; 🕐 <strong>Hora del dispositivo:</strong> ${horaStr}
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Clave</th>
+                                <th>Apellidos</th>
+                                <th>Nombre</th>
+                                <th>Grado</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                attendanceList.forEach((entry, index) => {
+                    const statusLabel = getStatusLabel(entry.status);
+                    const statusClass = getStatusClass(entry.status);
+                    printHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${entry.clave}</td>
+                            <td>${entry.apellidos}</td>
+                            <td>${entry.nombre}</td>
+                            <td>${entry.grado}</td>
+                            <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+                        </tr>
+                    `;
+                });
+
+                printHTML += `
+                        </tbody>
+                    </table>
+                    <div class="summary">
+                        <div>✅ Presentes: ${presenteCount}</div>
+                        <div>❌ Ausentes: ${ausenteCount}</div>
+                        <div>⚪ Nulos: ${nuloCount}</div>
+                        <div>📋 Total: ${attendanceList.length}</div>
+                    </div>
+                    <div class="footer">
+                        Documento generado automáticamente · Laboratorio · ${fechaStr} a las ${horaStr}
+                    </div>
+                </body>
+                </html>
+                `;
+
+                const printWindow = window.open('', '_blank', 'width=900,height=700');
+                if (printWindow) {
+                    printWindow.document.write(printHTML);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => {
+                        printWindow.print();
+                    }, 400);
+                } else {
+                    alert('No se pudo abrir la ventana de impresión. Verifica los bloqueadores de ventanas emergentes.');
+                }
+            }
+
+            // ==================== EVENT LISTENERS ====================
+            btnSearch.addEventListener('click', performSearch);
+            btnClearSearch.addEventListener('click', clearSearch);
+            
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch();
+                }
+            });
+
+            gradeFilter.addEventListener('change', performSearch);
+            btnDownloadPDF.addEventListener('click', downloadPDF);
+
+            // ==================== INICIALIZACIÓN ====================
+            function init() {
+                const allStudents = getAllStudents();
+                renderResults(allStudents);
+                renderAttendance();
+            }
+
+            init();
+
+            console.log('✅ Sistema de Asistencia Laboratorio inicializado correctamente.');
+            console.log('📊 Base de datos cargada:', getAllStudents().length, 'estudiantes.');
+            console.log('🔄 Botones de estado: NULO (gris) → PRESENTE (verde) → AUSENTE (rojo) → NULO (gris)');
+        })();
+    </script>
+</body>
+</html>
